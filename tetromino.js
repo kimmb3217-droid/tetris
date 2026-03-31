@@ -1,15 +1,6 @@
 // tetromino.js
-// 7가지 테트로미노의 고유 색상(CSS 변수 색상 고려)과 형태를 정의합니다.
-
-const COLORS = {
-    I: '#00eeee', // Cyan
-    J: '#1e90ff', // Blue
-    L: '#ff8c00', // Orange
-    O: '#ffd700', // Yellow
-    S: '#32cd32', // Green
-    T: '#9370db', // Purple
-    Z: '#ff4500'  // Red
-};
+// 7가지 테트로미노의 고유 타입과 형태를 정의합니다.
+// 색상은 CSS 클래스 네이밍(block-I, block-J 등)을 사용합니다.
 
 const SHAPES = {
     I: [
@@ -52,7 +43,7 @@ const SHAPES = {
 class Tetromino {
     constructor(type) {
         this.type = type;
-        this.color = COLORS[type];
+        this.color = type; // 클래스명 접미사로 사용
         this.shape = SHAPES[type];
         // 처음 등장 위치: 위쪽 중앙 
         this.x = type === 'O' ? 4 : 3;
@@ -61,7 +52,6 @@ class Tetromino {
 
     // 시계 방향 회전 (새로운 형태의 매트릭스 반환)
     getRotatedShape() {
-        // N x N 정사각형 매트릭스 전치(Transpose) 후 각 행을 뒤집음(Reverse)
         const N = this.shape.length;
         const result = [];
         for (let i = 0; i < N; i++) {

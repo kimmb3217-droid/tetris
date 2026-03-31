@@ -1,49 +1,53 @@
 // game.js
-// 게임 메인 루프, 렌더링, 키보드 입력 및 보드/스코어 관리를 담당합니다.
+// Tetris Neon Kineticism: DOM Rendering Engine
 
-const canvas = document.getElementById('tetris-board');
-const ctx = canvas.getContext('2d');
-const nextCanvas = document.getElementById('next-block-board');
-const nextCtx = nextCanvas.getContext('2d');
-
-const BLOCK_SIZE = 30; // 300 / 10 = 30
-ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
-// 다음 블록 캔버스는 120x120 -> 4x4 블록 크기로 스케일
-nextCtx.scale(BLOCK_SIZE, BLOCK_SIZE);
-
+const boardEl = document.getElementById('game-board');
 const scoreEl = document.getElementById('score');
 const linesEl = document.getElementById('lines');
+const levelEl = document.getElementById('level');
+const nextGridEl = document.getElementById('next-piece-grid');
+const heldGridEl = document.getElementById('held-piece-grid');
+const mobileNextGridEl = document.getElementById('mobile-next-grid');
+const mobileHeldGridEl = document.getElementById('mobile-held-grid');
 const restartBtn = document.getElementById('restart-btn');
 const modal = document.getElementById('game-over-modal');
 const finalScoreEl = document.getElementById('final-score');
 
-let board = new Board();
+let board = new Board(); // COLS=10, ROWS=20
 let currentPiece = null;
 let nextPiece = null;
+let heldPiece = null;
+let canHold = true;
 
 let score = 0;
 let lines = 0;
+let level = 1;
 let requestAnimationId = null;
 
-// 시간 제어 변수
 let dropCounter = 0;
-let dropInterval = 1000; // 1초마다 자동 하강
+let dropInterval = 1000;
 let lastTime = 0;
 
-// 조작 관련
 const KEYS = {
     LEFT: 'ArrowLeft',
     RIGHT: 'ArrowRight',
     DOWN: 'ArrowDown',
     UP: 'ArrowUp',
-    SPACE: ' '
+    SPACE: ' ',
+    HOLD: 'c',
+    HOLD_ALT: 'C',
+    SHIFT: 'Shift'
 };
 
 function init() {
     board.reset();
     score = 0;
     lines = 0;
+    level = 1;
     dropInterval = 1000;
+    heldPiece = null;
+    canHold = true;
+    
     updateScore();
     
     currentPiece = getRandomPiece();
@@ -56,7 +60,7 @@ function init() {
     }
     
     lastTime = 0;
-    draw(); // 초기 렌더링
+    draw();
     requestAnimationId = requestAnimationFrame(update);
 }
 
@@ -66,90 +70,191 @@ function getRandomPiece() {
     return new Tetromino(type);
 }
 
-// 개별 블록 그리기 (입체감 추가)
-function drawBlock(context, x, y, color) {
-    context.fillStyle = color;
-    context.fillRect(x, y, 1, 1);
-    
-    // 블록의 얇은 테두리/그림자 효과를 주어 세련되게 표현
-    context.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    context.fillRect(x, y, 1, 0.1); // top
-    context.fillRect(x, y, 0.1, 1); // left
-    
-    context.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    context.fillRect(x, y + 0.9, 1, 0.1); // bottom
-    context.fillRect(x + 0.9, y, 0.1, 1); // right
-}
+// ---------------- 렌더링 엔진 (DOM 기반) ----------------
 
-function drawBoard() {
-    for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-            if (board.grid[r][c] !== 0) {
-                drawBlock(ctx, c, r, board.grid[r][c]);
-            }
-        }
+function createBlockElement(x, y, colorClass, type = 'normal') {
+    const cell = document.createElement('div');
+    cell.className = `block-cell ${type === 'ghost' ? 'ghost-piece' : ''}`;
+    cell.style.left = `${x * 10}%`;
+    cell.style.top = `${y * 5}%`;
+    
+    const block = document.createElement('div');
+    block.className = type === 'ghost' ? `ghost-block text-block-${colorClass}` : `tetris-block block-${colorClass}`;
+    if (type === 'ghost') {
+        // 고스트 피스는 디자인 요구사항에 따라 currentColor (border) 사용
+        block.style.color = getHexForType(colorClass);
     }
-}
-
-function drawPiece(context, piece, offsetX = 0, offsetY = 0) {
-    for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-            if (piece.shape[r][c] !== 0) {
-                drawBlock(context, piece.x + c + offsetX, piece.y + r + offsetY, piece.color);
-            }
-        }
-    }
-}
-
-function drawNextPiece() {
-    nextCtx.clearRect(0, 0, nextCanvas.width / BLOCK_SIZE, nextCanvas.height / BLOCK_SIZE);
     
-    // 블록을 4x4 캔버스 중앙에 오게 하기 위한 계산
-    const noopOffset = nextPiece.type === 'O' || nextPiece.type === 'I' ? 0.5 : 0;
-    const offsetX = (4 - nextPiece.shape[0].length) / 2 - nextPiece.x + noopOffset;
-    const offsetY = (4 - nextPiece.shape.length) / 2 - nextPiece.y + noopOffset;
+    cell.appendChild(block);
+    return cell;
+}
 
-    drawPiece(nextCtx, nextPiece, offsetX, offsetY);
+function getHexForType(type) {
+    const hex = {
+        I: '#00f0f0', J: '#0000f0', L: '#f0a000', O: '#f0f000', S: '#00f000', T: '#a000f0', Z: '#f00000'
+    };
+    return hex[type] || '#fff';
 }
 
 function draw() {
-    // 캔버스 초기화
-    ctx.clearRect(0, 0, canvas.width / BLOCK_SIZE, canvas.height / BLOCK_SIZE);
-    drawBoard();
-    drawPiece(ctx, currentPiece);
-    drawNextPiece();
+    // 1. 보드 비우기
+    boardEl.innerHTML = '';
+    
+    // 2. 고스트 피스 그리기
+    const ghost = getGhostPiece();
+    drawPieceToContainer(boardEl, ghost, 'ghost');
+    
+    // 3. 현재 피스 그리기
+    drawPieceToContainer(boardEl, currentPiece);
+    
+    // 4. 이미 쌓인 보드 블록 그리기
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            if (board.grid[r][c] !== 0) {
+                const el = createBlockElement(c, r, board.grid[r][c]);
+                boardEl.appendChild(el);
+            }
+        }
+    }
+    
+    // 5. 사이드 패널 업데이트 (Next, Held)
+    updateSidePanels();
 }
 
-// 한 칸 하강
+function drawPieceToContainer(container, piece, type = 'normal') {
+    for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[r].length; c++) {
+            if (piece.shape[r][c] !== 0) {
+                const el = createBlockElement(piece.x + c, piece.y + r, piece.color, type);
+                container.appendChild(el);
+            }
+        }
+    }
+}
+
+function updateSidePanels() {
+    renderSmallGrid(nextGridEl, nextPiece);
+    renderSmallGrid(mobileNextGridEl, nextPiece);
+    
+    if (heldPiece) {
+        renderSmallGrid(heldGridEl, heldPiece);
+        renderSmallGrid(mobileHeldGridEl, heldPiece);
+    } else {
+        heldGridEl.innerHTML = '';
+        mobileHeldGridEl.innerHTML = '';
+    }
+}
+
+function renderSmallGrid(container, piece) {
+    container.innerHTML = '';
+    
+    // 4x4 그리드 생성 (디자인 시안에 따라 grid-cols-4 등 적용됨)
+    // 위치 보정: 4x4 내 중앙 정렬
+    const size = piece.type === 'I' ? 4 : (piece.type === 'O' ? 2 : 3);
+    const offset = (4 - size) / 2;
+    
+    for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[r].length; c++) {
+            if (piece.shape[r][c] !== 0) {
+                const block = document.createElement('div');
+                block.className = `aspect-square tetris-block block-${piece.color}`;
+                // Tailwind grid child position: (r+1) / (c+1) but since we use raw divs in a grid, we just append in order?
+                // No, better to use absolute mapping if it's a fixed grid, 
+                // but for simplicity, we can just use 16 empty divs and overwrite the ones we need.
+            }
+        }
+    }
+    
+    // 더 간단한 방법: 4x4 fixed grid를 사용하고 조각 모양에 맞춰 채우기
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    container.style.gridTemplateRows = 'repeat(4, 1fr)';
+    
+    const cells = Array.from({length: 16}, () => document.createElement('div'));
+    cells.forEach(c => {
+        c.className = 'aspect-square'; 
+        container.appendChild(c);
+    });
+    
+    const startRow = Math.floor((4 - piece.shape.length) / 2);
+    const startCol = Math.floor((4 - piece.shape[0].length) / 2);
+    
+    for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[r].length; c++) {
+            if (piece.shape[r][c] !== 0) {
+                const index = (startRow + r) * 4 + (startCol + c);
+                if (index >= 0 && index < 16) {
+                    cells[index].className = `aspect-square tetris-block block-${piece.color}`;
+                }
+            }
+        }
+    }
+}
+
+// ---------------- 게임 로직 ----------------
+
+function getGhostPiece() {
+    const ghost = new Tetromino(currentPiece.type);
+    ghost.shape = currentPiece.shape;
+    ghost.x = currentPiece.x;
+    ghost.y = currentPiece.y;
+    
+    while (board.isValidPos(ghost, ghost.x, ghost.y + 1)) {
+        ghost.y++;
+    }
+    return ghost;
+}
+
+function hold() {
+    if (!canHold) return;
+    
+    if (heldPiece === null) {
+        heldPiece = new Tetromino(currentPiece.type);
+        currentPiece = nextPiece;
+        nextPiece = getRandomPiece();
+    } else {
+        const temp = heldPiece.type;
+        heldPiece = new Tetromino(currentPiece.type);
+        currentPiece = new Tetromino(temp);
+    }
+    
+    canHold = false;
+    draw();
+}
+
 function drop() {
     if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y + 1)) {
         currentPiece.y++;
     } else {
-        // 더 이상 내려갈 수 없으면 바닥(또는 다른 블록)에 병합
         board.merge(currentPiece);
         
-        // 병합된 블록 중 천장(y=0) 이상에 있는 게 있다면 게임 오버
-        if (currentPiece.y < 0) {
+        if (currentPiece.y <= 0) {
             gameOver();
             return;
         }
 
-        // 라인 클리어 및 점수 계산
         const cleared = board.clearLines();
         if (cleared > 0) {
             lines += cleared;
             // 라인 제거 별 점수 가중치 1->100, 2->300, 3->500, 4->800
             const pts = [0, 100, 300, 500, 800];
-            score += pts[cleared];
-            // 속도 빨라지게 (최소 100ms)
-            dropInterval = Math.max(100, 1000 - (lines * 10));
+            score += pts[cleared] * level; // 레벨 배수 적용
+            
+            // 레벨업 로직 (10줄마다)
+            const newLevel = Math.floor(lines / 10) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                // 최소 100ms까지 속도 증가
+                dropInterval = Math.max(100, 1000 - (level - 1) * 100);
+            }
+            
             updateScore();
         }
 
         currentPiece = nextPiece;
         nextPiece = getRandomPiece();
+        canHold = true; // 새로운 피스가 나오면 Hold 가능
 
-        // 새 피스가 생성되자마자 충돌하면 게임 오버
         if (!board.isValidPos(currentPiece, currentPiece.x, currentPiece.y)) {
             gameOver();
         }
@@ -157,29 +262,30 @@ function drop() {
     dropCounter = 0;
 }
 
-// 스페이스바 하드 드롭
 function hardDrop() {
+    let bonus = 0;
     while (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y + 1)) {
         currentPiece.y++;
-        score += 2; // 하드 드롭 보너스 점수
+        bonus += 2;
     }
+    score += bonus;
     drop();
     updateScore();
 }
 
 function updateScore() {
-    scoreEl.innerText = score;
+    scoreEl.innerText = score.toLocaleString(); // 디자인에 맞춰 콤마 추가
     linesEl.innerText = lines;
+    levelEl.innerText = level;
 }
 
 function gameOver() {
     cancelAnimationFrame(requestAnimationId);
     requestAnimationId = null;
-    finalScoreEl.innerText = score;
+    finalScoreEl.innerText = score.toLocaleString();
     modal.classList.remove('hidden');
 }
 
-// 메인 루프 (requestAnimationFrame)
 function update(time = 0) {
     if (!lastTime) lastTime = time;
     const deltaTime = time - lastTime;
@@ -197,9 +303,9 @@ function update(time = 0) {
     }
 }
 
-// 키보드 입력
+// ---------------- 제어 ----------------
+
 document.addEventListener('keydown', event => {
-    // 키 입력 기본 동작 방지(방향키 스크롤, 스페이스바 페이지 넘김 등)
     if (Object.values(KEYS).includes(event.key)) {
         event.preventDefault();
     }
@@ -222,7 +328,7 @@ document.addEventListener('keydown', event => {
         case KEYS.DOWN:
             if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y + 1)) {
                 currentPiece.y++;
-                score += 1; // 소프트 드롭 보너스
+                score += 1;
                 updateScore();
                 draw();
             }
@@ -238,10 +344,14 @@ document.addEventListener('keydown', event => {
             hardDrop();
             draw();
             break;
+        case KEYS.HOLD:
+        case KEYS.HOLD_ALT:
+        case KEYS.SHIFT:
+            hold();
+            break;
     }
 });
 
 restartBtn.addEventListener('click', init);
 
-// 게임 최초 시작
 init();
