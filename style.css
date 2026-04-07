@@ -99,3 +99,38 @@ body {
 .glow-animation {
     animation: pulse-glow 3s infinite ease-in-out;
 }
+
+/* --- Desktop Keyboard Guide --- */
+.key-guide-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.key-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 5px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1.5px solid rgba(176, 190, 197, 0.5);
+    border-bottom: 3px solid rgba(144, 164, 174, 0.6);
+    border-radius: 6px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #546E7A;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.key-label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #78909C;
+    white-space: nowrap;
+}

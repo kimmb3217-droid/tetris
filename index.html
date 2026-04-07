@@ -204,12 +204,37 @@
                         <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-surface px-3 py-1 rounded-full text-[9px] font-headline font-extrabold tracking-widest text-on-surface-variant uppercase shadow-sm border border-outline-variant/20">NEXT</span>
                         <div id="next-piece-grid" class="w-16 h-16"></div>
                     </div>
+
+                    <!-- Desktop Keyboard Guide (hidden on mobile) -->
+                    <div class="hidden md:flex flex-col gap-2 w-28">
+                        <span class="text-[9px] font-headline font-extrabold tracking-widest text-on-surface-variant uppercase text-center mb-1">CONTROLS</span>
+                        <div class="key-guide-row">
+                            <span class="key-badge">←</span><span class="key-badge">→</span>
+                            <span class="key-label">이동</span>
+                        </div>
+                        <div class="key-guide-row">
+                            <span class="key-badge">↑</span>
+                            <span class="key-label">회전</span>
+                        </div>
+                        <div class="key-guide-row">
+                            <span class="key-badge">↓</span>
+                            <span class="key-label">내리기</span>
+                        </div>
+                        <div class="key-guide-row">
+                            <span class="key-badge">Space</span>
+                            <span class="key-label">드롭</span>
+                        </div>
+                        <div class="key-guide-row">
+                            <span class="key-badge">C</span>
+                            <span class="key-label">홀드</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
 
-        <!-- Gameplay Controls -->
-        <div class="fixed bottom-24 left-1/2 -translate-x-1/2 grid grid-cols-5 gap-4 px-4 w-full max-w-md z-40">
+        <!-- Gameplay Controls (Mobile Only) -->
+        <div class="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 grid grid-cols-5 gap-4 px-4 w-full max-w-md z-40">
             <button id="ctrl-hold" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
                 <span class="material-symbols-outlined text-3xl">swap_horiz</span>
             </button>
