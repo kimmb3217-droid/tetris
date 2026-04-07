@@ -1,237 +1,290 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="light" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Tetris Neon Kineticism</title>
+    <title>NEON TETRIX - Kinetic Observatory</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "surface-container": "#11192a",
-                        "background": "#070e1b",
-                        "tertiary-container": "#cafd00",
-                        "surface-container-high": "#172031",
-                        "on-primary-container": "#005359",
-                        "tertiary-fixed-dim": "#beee00",
-                        "on-primary-fixed": "#003f43",
-                        "on-surface-variant": "#a5abbd",
-                        "primary": "#8ff5ff",
-                        "on-secondary-container": "#fff5f9",
-                        "on-secondary-fixed": "#620061",
-                        "surface": "#070e1b",
-                        "surface-tint": "#8ff5ff",
-                        "secondary-fixed": "#ffbdf3",
-                        "error-container": "#9f0519",
-                        "primary-fixed-dim": "#00deec",
-                        "on-background": "#e2e8fb",
-                        "tertiary-fixed": "#cafd00",
-                        "surface-container-highest": "#1c2639",
-                        "primary-fixed": "#00eeec",
-                        "surface-dim": "#070e1b",
-                        "inverse-primary": "#006a71",
-                        "on-primary-fixed-variant": "#005e64",
-                        "on-secondary-fixed-variant": "#920091",
-                        "primary-container": "#00eefc",
-                        "on-tertiary-fixed": "#3a4a00",
-                        "on-tertiary-fixed-variant": "#526900",
-                        "tertiary": "#f3ffca",
-                        "surface-variant": "#1c2639",
-                        "inverse-surface": "#f9f9ff",
-                        "on-secondary": "#400040",
-                        "tertiary-dim": "#beee00",
-                        "secondary": "#ff51fa",
-                        "on-surface": "#e2e8fb",
-                        "on-error-container": "#ffa8a3",
-                        "primary-dim": "#00deec",
-                        "surface-container-low": "#0c1322",
-                        "outline-variant": "#414857",
-                        "on-primary": "#005d63",
-                        "secondary-dim": "#ff51fa",
-                        "secondary-fixed-dim": "#ffa6f3",
-                        "secondary-container": "#a900a9",
-                        "error-dim": "#d7383b",
-                        "outline": "#6f7586",
-                        "on-tertiary-container": "#4a5e00",
-                        "on-tertiary": "#516700",
-                        "surface-bright": "#222c41",
-                        "inverse-on-surface": "#4e5565",
-                        "on-error": "#490006",
-                        "error": "#ff716c"
+                    "colors": {
+                        "primary": "#607D8B",
+                        "on-primary": "#FFFFFF",
+                        "primary-container": "#CFD8DC",
+                        "on-primary-container": "#101F23",
+                        "secondary": "#546E7A",
+                        "on-secondary": "#FFFFFF",
+                        "secondary-container": "#ECEFF1",
+                        "tertiary": "#78909C",
+                        "background": "#F5F7F8",
+                        "surface": "#FFFFFF",
+                        "surface-variant": "#E1E4E6",
+                        "on-surface": "#263238",
+                        "on-surface-variant": "#546E7A",
+                        "outline": "#B0BEC5",
+                        "outline-variant": "#CFD8DC",
+                        "surface-container-low": "#F8FAFB",
+                        "surface-container": "#F0F2F4",
+                        "surface-container-high": "#E8EAEB",
+                        "surface-container-highest": "#E1E3E5",
+                        "block-cyan": "#4DD0E1",
+                        "block-blue": "#64B5F6",
+                        "block-orange": "#FFB74D",
+                        "block-yellow": "#FFF176",
+                        "block-green": "#81C784",
+                        "block-purple": "#BA68C8",
+                        "block-red": "#E57373"
                     },
-                    fontFamily: {
-                        "headline": ["Space Grotesk"],
-                        "body": ["Plus Jakarta Sans"],
-                        "label": ["Space Grotesk"]
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
                     },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    "fontFamily": {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
                 },
             },
         }
     </script>
-    <style>
-        /* Ensuring perfect squares for the grid and blocks */
-        .tetris-grid {
-            background-image: 
-                linear-gradient(to right, rgba(65, 72, 87, 0.4) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(65, 72, 87, 0.4) 1px, transparent 1px);
-            background-size: 10% 5%; /* 10 columns, 20 rows */
-            background-position: -0.5px -0.5px;
-            aspect-ratio: 10 / 20;
-            position: relative;
-        }
-
-        /* Standard block with black outline and lighter inner border for depth */
-        .tetris-block {
-            width: 100%;
-            height: 100%;
-            border: 1px solid #000;
-            position: relative;
-            box-sizing: border-box;
-        }
-        .tetris-block::after {
-            content: '';
-            position: absolute;
-            inset: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            pointer-events: none;
-        }
-
-        /* Container for blocks within the grid */
-        .block-cell {
-            position: absolute;
-            width: 10%;
-            height: 5%;
-            transition: top 0.1s linear, left 0.1s ease-in-out;
-        }
-
-        /* Standard Tetris Colors matching the design classes */
-        .block-I { background-color: #00f0f0; box-shadow: inset 0 0 10px rgba(0, 240, 240, 0.5); }
-        .block-J { background-color: #0000f0; box-shadow: inset 0 0 10px rgba(0, 0, 240, 0.5); }
-        .block-L { background-color: #f0a000; box-shadow: inset 0 0 10px rgba(240, 160, 0, 0.5); }
-        .block-O { background-color: #f0f000; box-shadow: inset 0 0 10px rgba(240, 240, 0, 0.5); }
-        .block-S { background-color: #00f000; box-shadow: inset 0 0 10px rgba(0, 240, 0, 0.5); }
-        .block-T { background-color: #a000f0; box-shadow: inset 0 0 10px rgba(160, 0, 240, 0.5); }
-        .block-Z { background-color: #f00000; box-shadow: inset 0 0 10px rgba(240, 0, 0, 0.5); }
-
-        .ghost-piece {
-            opacity: 0.3;
-        }
-        .ghost-block {
-            width: 100%;
-            height: 100%;
-            border: 2px solid currentColor;
-            background-color: transparent;
-        }
-
-        body {
-            min-height: 100dvh;
-        }
-
-        #game-over-modal {
-            background: rgba(7, 14, 27, 0.85);
-            backdrop-filter: blur(10px);
-        }
-
-        .hidden { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-background text-on-surface font-body overflow-hidden h-screen flex flex-col">
-    <!-- Minimalist Top Bar -->
-    <header class="fixed top-0 w-full z-50 bg-transparent flex justify-between items-center px-6 py-4">
-        <button class="active:scale-95 transition-transform text-slate-400 hover:text-cyan-200">
-            <span class="material-symbols-outlined">menu</span>
-        </button>
-        <h1 class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-lg font-bold text-cyan-400 drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]">
-            TETRIS NEON
-        </h1>
-        <button class="active:scale-95 transition-transform text-slate-400 hover:text-cyan-200">
-            <span class="material-symbols-outlined">settings</span>
-        </button>
-    </header>
+<body class="font-body text-on-surface">
 
-    <main class="flex-1 flex flex-col items-center justify-center px-4 pt-16 pb-8 relative">
-        <!-- Scoreboard -->
-        <div class="w-full flex flex-col items-center mb-4">
-            <span class="font-headline text-[10px] tracking-[0.2em] text-on-surface-variant uppercase">Current Score</span>
-            <span id="score" class="font-headline text-5xl font-bold text-primary tracking-tighter drop-shadow-[0_0_15px_rgba(143,245,255,0.4)]">
-                0
-            </span>
+    <!-- Global Background Elements -->
+    <div class="fixed inset-0 z-0 opacity-40 pointer-events-none">
+        <div class="absolute top-10 left-[10%] w-32 h-32 rounded-xl bg-primary/10 blur-3xl"></div>
+        <div class="absolute bottom-20 right-[15%] w-48 h-48 rounded-xl bg-secondary/10 blur-3xl"></div>
+        <div class="absolute top-1/4 right-10 rotate-12 bg-primary/5 w-16 h-16 rounded-lg border border-primary/10"></div>
+        <div class="absolute bottom-1/3 left-10 -rotate-12 bg-secondary/5 w-20 h-20 rounded-lg border border-secondary/10"></div>
+    </div>
+
+    <!-- Top Navigation Shell (Shared) -->
+    <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-surface/60 backdrop-blur-xl border-b border-outline-variant/30">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">grid_view</span>
         </div>
+        <h1 class="font-headline tracking-[0.15em] uppercase text-lg font-bold text-on-surface">NEON PULSE</h1>
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer" id="settings-btn">settings</span>
+        </div>
+    </nav>
 
-        <div class="w-full max-w-lg flex items-stretch justify-center gap-6 h-[65vh]">
-            <!-- Side Panel Left: HELD -->
-            <div class="hidden md:flex flex-1 flex-col gap-4 max-w-[100px]">
-                <div class="flex-1 bg-surface-container-high/40 backdrop-blur-xl rounded-xl border border-outline-variant/20 p-4 flex flex-col items-center">
-                    <span class="font-headline text-[10px] tracking-widest text-secondary uppercase mb-6">Held</span>
-                    <div id="held-piece-grid" class="grid grid-cols-4 gap-0.5 w-full">
-                        <!-- JS populated -->
+    <!-- [1] HOME SCREEN -->
+    <section id="screen-home" class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-32">
+        <div class="w-full max-w-md flex flex-col items-center gap-12">
+            <div class="text-center">
+                <div class="inline-block px-3 py-1 mb-4 rounded-full bg-surface-container-highest border border-outline-variant/50">
+                    <p class="text-[10px] font-headline font-semibold tracking-[0.2em] text-on-surface-variant uppercase">The Kinetic Observatory</p>
+                </div>
+                <h2 class="font-headline text-6xl md:text-7xl font-bold tracking-tighter text-on-surface flex flex-col leading-none">
+                    <span class="text-primary">NEON</span>
+                    <span class="text-secondary/80">TETRIX</span>
+                </h2>
+            </div>
+            
+            <div class="w-full glass-panel rounded-xl p-6 relative overflow-hidden subtle-shadow">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-primary/5 rounded-full blur-2xl"></div>
+                <div class="flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-headline font-semibold tracking-widest text-on-surface-variant uppercase mb-1">Personal Best</span>
+                        <span id="home-best-score" class="text-4xl font-headline font-bold text-on-surface leading-none">842,500</span>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-[10px] font-headline font-semibold tracking-widest text-on-surface-variant uppercase mb-1">Rank</span>
+                        <span class="text-2xl font-headline font-bold text-primary flex items-center gap-1">
+                            #12 <span class="material-symbols-outlined text-sm">trending_up</span>
+                        </span>
                     </div>
                 </div>
-                <div class="bg-surface-container-low rounded-lg p-3 flex flex-col items-center border border-outline-variant/10">
-                    <span class="font-headline text-[10px] tracking-widest text-on-surface-variant uppercase mb-1">Level</span>
-                    <span id="level" class="font-headline text-xl font-bold text-on-surface">1</span>
+            </div>
+
+            <div class="w-full flex flex-col gap-4">
+                <button id="start-game-btn" class="group relative w-full h-16 bg-primary rounded-xl overflow-hidden active:scale-95 transition-transform duration-200 subtle-shadow text-on-primary font-headline font-bold text-xl tracking-widest uppercase">
+                    START GAME
+                </button>
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="h-14 glass-panel rounded-xl flex items-center justify-center gap-3 border border-outline-variant/40 active:scale-95 transition-transform subtle-shadow">
+                        <span class="material-symbols-outlined text-secondary text-xl">layers</span>
+                        <span class="font-headline font-semibold text-xs tracking-widest text-on-surface uppercase">LEVELS</span>
+                    </button>
+                    <button class="h-14 glass-panel rounded-xl flex items-center justify-center gap-3 border border-outline-variant/40 active:scale-95 transition-transform subtle-shadow">
+                        <span class="material-symbols-outlined text-secondary text-xl">emoji_events</span>
+                        <span class="font-headline font-semibold text-xs tracking-widest text-on-surface uppercase">QUESTS</span>
+                    </button>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Central Game Board -->
-            <div id="game-board" class="h-full bg-surface-container-low rounded-xl border-2 border-surface-container-highest relative overflow-hidden tetris-grid">
-                <!-- JS populated blocks -->
+    <!-- [2] GAMEPLAY SCREEN (Minimalist View) -->
+    <section id="screen-play" class="hidden relative z-10 min-h-screen flex flex-col overflow-hidden">
+        <!-- HUD Header -->
+        <header class="fixed top-0 w-full z-50 flex justify-between items-center px-4 h-20 bg-surface/60 backdrop-blur-xl border-b border-outline-variant/10">
+            <div class="flex items-center gap-4">
+                <div class="bg-primary/10 rounded-2xl px-4 py-2 flex flex-col items-center border border-primary/20 shadow-sm">
+                    <span class="text-[9px] font-headline font-bold tracking-[0.2em] text-primary uppercase">SCORE</span>
+                    <span id="score" class="text-2xl font-headline font-extrabold text-primary leading-tight tracking-tight">0</span>
+                </div>
+                <div class="flex flex-col ml-1">
+                    <span class="text-[9px] font-headline font-bold tracking-[0.2em] text-on-surface-variant uppercase">LVL</span>
+                    <span id="level" class="text-base font-headline font-extrabold text-secondary leading-tight">1</span>
+                </div>
             </div>
+            <div class="flex items-center gap-4">
+                <div class="flex flex-col items-end">
+                    <span class="text-[9px] font-headline font-bold tracking-[0.2em] text-on-surface-variant uppercase">LINES</span>
+                    <span id="lines" class="text-base font-headline font-extrabold text-tertiary leading-tight">0</span>
+                </div>
+            </div>
+        </header>
 
-            <!-- Side Panel Right: NEXT -->
-            <div class="hidden md:flex flex-1 flex-col gap-4 max-w-[100px]">
-                <div id="next-piece-panel" class="flex-1 bg-surface-container-high/40 backdrop-blur-xl rounded-xl border border-outline-variant/20 p-4 flex flex-col items-center">
-                    <span class="font-headline text-[10px] tracking-widest text-primary uppercase mb-6">Next</span>
-                    <div id="next-piece-grid" class="flex flex-col gap-4 items-center w-full">
-                        <!-- JS populated -->
+        <!-- Main Gameplay Canvas -->
+        <main class="flex-grow relative flex items-center justify-center pt-24 pb-24 px-8 w-full">
+            <div class="flex items-start justify-center gap-6 max-w-lg w-full h-full">
+                <!-- Central Grid -->
+                <div class="relative h-[55vh] max-h-[600px] aspect-[10/20] z-10 w-full">
+                    <div id="game-board" class="tetris-grid h-full bg-surface/40 rounded-[2rem] border-[3px] border-white p-1.5 shadow-xl relative overflow-hidden">
+                        <!-- Faint background grid lines -->
+                        <div class="absolute inset-0 grid grid-cols-10 grid-rows-20 gap-px opacity-[0.02] pointer-events-none">
+                            <div class="border-r border-b border-on-surface"></div>
+                        </div>
+                        <!-- Canvas content will be inserted here by JS -->
                     </div>
                 </div>
-                <div class="bg-surface-container-low rounded-lg p-3 flex flex-col items-center border border-outline-variant/10">
-                    <span class="font-headline text-[10px] tracking-widest text-on-surface-variant uppercase mb-1">Lines</span>
-                    <span id="lines" class="font-headline text-xl font-bold text-on-surface">0</span>
+
+                <!-- Right Side Panel: HOLD and NEXT -->
+                <div class="flex flex-col gap-4 pt-4 shrink-0">
+                    <div class="glass-panel rounded-2xl p-4 w-28 h-28 flex flex-col items-center justify-center relative">
+                        <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-surface px-3 py-1 rounded-full text-[9px] font-headline font-extrabold tracking-widest text-on-surface-variant uppercase shadow-sm border border-outline-variant/20">HOLD</span>
+                        <div id="held-piece-grid" class="w-16 h-16"></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-4 w-28 h-28 flex flex-col items-center justify-center relative">
+                        <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-surface px-3 py-1 rounded-full text-[9px] font-headline font-extrabold tracking-widest text-on-surface-variant uppercase shadow-sm border border-outline-variant/20">NEXT</span>
+                        <div id="next-piece-grid" class="w-16 h-16"></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <!-- Mobile Previews -->
-        <div class="md:hidden flex gap-8 mt-6">
-            <div class="flex flex-col items-center">
-                <span class="font-headline text-[8px] tracking-widest text-secondary uppercase mb-2">Held</span>
-                <div id="mobile-held-grid" class="grid grid-cols-4 gap-0.5 w-8"></div>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="font-headline text-[8px] tracking-widest text-primary uppercase mb-2">Next</span>
-                <div id="mobile-next-grid" class="grid grid-cols-4 gap-0.5 w-8"></div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Game Over Modal -->
-    <div id="game-over-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-        <div class="bg-surface-container-highest border border-outline-variant/30 rounded-2xl p-8 max-w-sm w-full flex flex-col items-center text-center shadow-2xl">
-            <h2 class="font-headline text-3xl font-bold text-error mb-2">GAME OVER</h2>
-            <p class="text-on-surface-variant mb-6">Your record has been stored in the neon void.</p>
-            <div class="w-full bg-background/50 rounded-xl p-4 mb-8">
-                <span class="text-[10px] uppercase tracking-widest text-on-surface-variant">Final Score</span>
-                <div id="final-score" class="text-4xl font-bold text-primary">0</div>
-            </div>
-            <button id="restart-btn" class="w-full bg-primary text-on-primary font-bold py-3 rounded-xl hover:brightness-110 active:scale-95 transition-all">
-                TRY AGAIN
+        <!-- Gameplay Controls -->
+        <div class="fixed bottom-24 left-1/2 -translate-x-1/2 grid grid-cols-4 gap-4 px-4 w-full max-w-md z-40">
+            <button id="ctrl-left" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
+                <span class="material-symbols-outlined text-3xl">keyboard_arrow_left</span>
+            </button>
+            <button id="ctrl-rotate" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
+                <span class="material-symbols-outlined text-3xl">rotate_right</span>
+            </button>
+            <button id="ctrl-right" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
+                <span class="material-symbols-outlined text-3xl">keyboard_arrow_right</span>
+            </button>
+            <button id="ctrl-down" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
+                <span class="material-symbols-outlined text-3xl">keyboard_arrow_down</span>
             </button>
         </div>
-    </div>
+    </section>
 
-    <!-- Background Decoration -->
-    <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/5 rounded-full blur-[120px]"></div>
-    </div>
+    <!-- [3] GAME OVER SCREEN -->
+    <section id="screen-gameover" class="hidden relative z-10 min-h-screen flex flex-col items-center justify-center px-6">
+        <div class="w-full max-w-sm flex flex-col items-center">
+            <div class="mb-8 text-center">
+                <p class="text-[10px] font-headline tracking-[0.4em] text-on-surface-variant font-bold uppercase mb-2">SESSION ENDED</p>
+                <h2 class="text-6xl font-headline font-extrabold text-secondary tracking-tighter italic">GAME OVER</h2>
+            </div>
+            
+            <div id="new-high-score-badge" class="hidden mb-6 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">stars</span>
+                <span class="text-primary text-[10px] font-headline font-bold tracking-widest uppercase">NEW HIGH SCORE!</span>
+            </div>
+
+            <div class="w-full grid grid-cols-2 gap-4 mb-10 text-center">
+                <div class="col-span-2 glass-panel p-6 rounded-xl border border-outline/30 shadow-sm">
+                    <span class="text-on-surface-variant text-[10px] font-headline tracking-widest font-bold uppercase mb-1">FINAL SCORE</span>
+                    <span id="final-score" class="text-5xl font-headline font-extrabold text-primary tracking-tighter block">142,580</span>
+                </div>
+                <div class="glass-panel p-5 rounded-xl border border-outline/30 shadow-sm">
+                    <span class="text-on-surface-variant text-[9px] font-headline tracking-widest font-bold uppercase mb-1">LINES</span>
+                    <span id="final-lines" class="text-2xl font-headline font-bold text-on-surface block">124</span>
+                </div>
+                <div class="glass-panel p-5 rounded-xl border border-outline/30 shadow-sm">
+                    <span class="text-on-surface-variant text-[9px] font-headline tracking-widest font-bold uppercase mb-1">LEVEL</span>
+                    <span id="final-level" class="text-2xl font-headline font-bold text-on-surface block">18</span>
+                </div>
+            </div>
+
+            <div class="w-full flex flex-col gap-4">
+                <button id="restart-btn" class="w-full h-16 rounded-xl bg-primary text-on-primary font-headline font-bold tracking-widest text-sm flex items-center justify-center gap-3 transition-all hover:bg-secondary active:scale-95 shadow-md">
+                    <span class="material-symbols-outlined">replay</span> REPLAY
+                </button>
+                <button id="go-home-btn" class="w-full h-14 rounded-xl bg-surface border border-outline text-on-surface-variant font-headline font-bold tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all hover:bg-surface-variant active:scale-95">
+                    <span class="material-symbols-outlined">home</span> BACK TO HOME
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- [4] RANK SCREEN -->
+    <section id="screen-rank" class="hidden relative z-10 pt-20 pb-32 px-4 max-w-md mx-auto min-h-screen">
+        <div class="flex justify-center mb-8 bg-surface-container-low p-1.5 rounded-xl border border-outline-variant/50">
+            <button class="flex-1 py-2 px-4 rounded-lg text-sm font-headline font-bold bg-white text-primary soft-elevation">Global</button>
+            <button class="flex-1 py-2 px-4 rounded-lg text-sm font-headline font-medium text-on-surface-variant">Friends</button>
+        </div>
+        
+        <!-- Podium Placeholder -->
+        <div class="flex items-end justify-center gap-2 mb-10 h-48">
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-16 h-16 rounded-full border-2 border-primary/20 bg-white soft-elevation mb-2"></div>
+                <span class="text-xs font-headline font-bold text-on-surface-variant">PLAYER_B</span>
+            </div>
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-20 h-20 rounded-full border-2 border-primary bg-white shadow-lg mb-3"></div>
+                <span class="text-sm font-headline font-bold text-on-background">TOP_ONE</span>
+            </div>
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-16 h-16 rounded-full border-2 border-primary/20 bg-white soft-elevation mb-2"></div>
+                <span class="text-xs font-headline font-bold text-on-surface-variant">PLAYER_C</span>
+            </div>
+        </div>
+        
+        <div class="space-y-3">
+             <div class="glass-panel rounded-xl p-4 flex items-center justify-between border border-outline-variant/40 soft-elevation">
+                <div class="flex items-center gap-4">
+                    <span class="w-6 text-center font-headline font-bold text-on-surface-variant">4</span>
+                    <p class="text-sm font-headline font-bold text-on-surface">PIXEL_REAPER</p>
+                </div>
+                <span class="font-headline font-bold text-sm text-primary">642,100</span>
+             </div>
+             <!-- More rows can be added -->
+        </div>
+    </section>
+
+    <!-- Navigation Bar (Persistent) -->
+    <nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/80 backdrop-blur-2xl border-t border-outline-variant/30 rounded-t-2xl">
+        <button id="nav-home" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">HOME</span>
+        </button>
+        <button id="nav-play" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+            <span class="material-symbols-outlined">sports_esports</span>
+            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">PLAY</span>
+        </button>
+        <button id="nav-rank" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+            <span class="material-symbols-outlined">leaderboard</span>
+            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">RANK</span>
+        </button>
+        <button id="nav-user" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">USER</span>
+        </button>
+    </nav>
 
     <script src="./tetromino.js"></script>
     <script src="./board.js"></script>

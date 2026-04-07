@@ -1,19 +1,30 @@
 // game.js
-// Tetris Neon Kineticism: DOM Rendering Engine
+// NEON TETRIX - Kinetic Observatory Rendering Engine
 
+// --- DOM Elements ---
 const boardEl = document.getElementById('game-board');
 const scoreEl = document.getElementById('score');
 const linesEl = document.getElementById('lines');
 const levelEl = document.getElementById('level');
 const nextGridEl = document.getElementById('next-piece-grid');
 const heldGridEl = document.getElementById('held-piece-grid');
-const mobileNextGridEl = document.getElementById('mobile-next-grid');
-const mobileHeldGridEl = document.getElementById('mobile-held-grid');
-const restartBtn = document.getElementById('restart-btn');
-const modal = document.getElementById('game-over-modal');
-const finalScoreEl = document.getElementById('final-score');
 
-let board = new Board(); // COLS=10, ROWS=20
+const finalScoreEl = document.getElementById('final-score');
+const finalLinesEl = document.getElementById('final-lines');
+const finalLevelEl = document.getElementById('final-level');
+const newHighScoreBadge = document.getElementById('new-high-score-badge');
+
+const screens = {
+    home: document.getElementById('screen-home'),
+    play: document.getElementById('screen-play'),
+    gameOver: document.getElementById('screen-gameover'),
+    rank: document.getElementById('screen-rank')
+};
+
+const homeBestScoreEl = document.getElementById('home-best-score');
+
+// --- Game State ---
+let board = new Board();
 let currentPiece = null;
 let nextPiece = null;
 let heldPiece = null;
@@ -27,6 +38,7 @@ let requestAnimationId = null;
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
+let isPaused = false;
 
 const KEYS = {
     LEFT: 'ArrowLeft',
@@ -39,6 +51,23 @@ const KEYS = {
     SHIFT: 'Shift'
 };
 
+// --- Screen Management ---
+function showScreen(screenKey) {
+    Object.values(screens).forEach(s => s.classList.add('hidden'));
+    if (screens[screenKey]) {
+        screens[screenKey].classList.remove('hidden');
+    }
+    
+    // Stop game loop if not on play screen
+    if (screenKey !== 'play') {
+        if (requestAnimationId) {
+            cancelAnimationFrame(requestAnimationId);
+            requestAnimationId = null;
+        }
+    }
+}
+
+// --- Initialization ---
 function init() {
     board.reset();
     score = 0;
@@ -47,17 +76,16 @@ function init() {
     dropInterval = 1000;
     heldPiece = null;
     canHold = true;
+    isPaused = false;
     
     updateScore();
     
     currentPiece = getRandomPiece();
     nextPiece = getRandomPiece();
     
-    modal.classList.add('hidden');
+    if (newHighScoreBadge) newHighScoreBadge.classList.add('hidden');
     
-    if (requestAnimationId) {
-        cancelAnimationFrame(requestAnimationId);
-    }
+    showScreen('play');
     
     lastTime = 0;
     draw();
@@ -70,8 +98,7 @@ function getRandomPiece() {
     return new Tetromino(type);
 }
 
-// ---------------- 렌더링 엔진 (DOM 기반) ----------------
-
+// --- Rendering Logic ---
 function createBlockElement(x, y, colorClass, type = 'normal') {
     const cell = document.createElement('div');
     cell.className = `block-cell ${type === 'ghost' ? 'ghost-piece' : ''}`;
@@ -79,9 +106,9 @@ function createBlockElement(x, y, colorClass, type = 'normal') {
     cell.style.top = `${y * 5}%`;
     
     const block = document.createElement('div');
-    block.className = type === 'ghost' ? `ghost-block text-block-${colorClass}` : `tetris-block block-${colorClass}`;
+    block.className = type === 'ghost' ? `ghost-block` : `tetris-block block-${colorClass}`;
+    
     if (type === 'ghost') {
-        // 고스트 피스는 디자인 요구사항에 따라 currentColor (border) 사용
         block.style.color = getHexForType(colorClass);
     }
     
@@ -91,23 +118,22 @@ function createBlockElement(x, y, colorClass, type = 'normal') {
 
 function getHexForType(type) {
     const hex = {
-        I: '#00f0f0', J: '#0000f0', L: '#f0a000', O: '#f0f000', S: '#00f000', T: '#a000f0', Z: '#f00000'
+        I: '#4DD0E1', J: '#64B5F6', L: '#FFB74D', O: '#FFF176', S: '#81C784', T: '#BA68C8', Z: '#E57373'
     };
     return hex[type] || '#fff';
 }
 
 function draw() {
-    // 1. 보드 비우기
     boardEl.innerHTML = '';
     
-    // 2. 고스트 피스 그리기
+    // Ghost
     const ghost = getGhostPiece();
     drawPieceToContainer(boardEl, ghost, 'ghost');
     
-    // 3. 현재 피스 그리기
+    // Current
     drawPieceToContainer(boardEl, currentPiece);
     
-    // 4. 이미 쌓인 보드 블록 그리기
+    // Stacked
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             if (board.grid[r][c] !== 0) {
@@ -117,7 +143,6 @@ function draw() {
         }
     }
     
-    // 5. 사이드 패널 업데이트 (Next, Held)
     updateSidePanels();
 }
 
@@ -134,47 +159,26 @@ function drawPieceToContainer(container, piece, type = 'normal') {
 
 function updateSidePanels() {
     renderSmallGrid(nextGridEl, nextPiece);
-    renderSmallGrid(mobileNextGridEl, nextPiece);
-    
     if (heldPiece) {
         renderSmallGrid(heldGridEl, heldPiece);
-        renderSmallGrid(mobileHeldGridEl, heldPiece);
     } else {
         heldGridEl.innerHTML = '';
-        mobileHeldGridEl.innerHTML = '';
     }
 }
 
 function renderSmallGrid(container, piece) {
     container.innerHTML = '';
-    
-    // 4x4 그리드 생성 (디자인 시안에 따라 grid-cols-4 등 적용됨)
-    // 위치 보정: 4x4 내 중앙 정렬
-    const size = piece.type === 'I' ? 4 : (piece.type === 'O' ? 2 : 3);
-    const offset = (4 - size) / 2;
-    
-    for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-            if (piece.shape[r][c] !== 0) {
-                const block = document.createElement('div');
-                block.className = `aspect-square tetris-block block-${piece.color}`;
-                // Tailwind grid child position: (r+1) / (c+1) but since we use raw divs in a grid, we just append in order?
-                // No, better to use absolute mapping if it's a fixed grid, 
-                // but for simplicity, we can just use 16 empty divs and overwrite the ones we need.
-            }
-        }
-    }
-    
-    // 더 간단한 방법: 4x4 fixed grid를 사용하고 조각 모양에 맞춰 채우기
     container.style.display = 'grid';
     container.style.gridTemplateColumns = 'repeat(4, 1fr)';
     container.style.gridTemplateRows = 'repeat(4, 1fr)';
+    container.className = 'w-full h-full gap-1';
     
-    const cells = Array.from({length: 16}, () => document.createElement('div'));
-    cells.forEach(c => {
-        c.className = 'aspect-square'; 
-        container.appendChild(c);
+    const cells = Array.from({length: 16}, () => {
+        const d = document.createElement('div');
+        d.className = 'aspect-square';
+        return d;
     });
+    cells.forEach(c => container.appendChild(c));
     
     const startRow = Math.floor((4 - piece.shape.length) / 2);
     const startCol = Math.floor((4 - piece.shape[0].length) / 2);
@@ -184,21 +188,21 @@ function renderSmallGrid(container, piece) {
             if (piece.shape[r][c] !== 0) {
                 const index = (startRow + r) * 4 + (startCol + c);
                 if (index >= 0 && index < 16) {
-                    cells[index].className = `aspect-square tetris-block block-${piece.color}`;
+                    const block = document.createElement('div');
+                    block.className = `tetris-block block-${piece.color} w-full h-full`;
+                    cells[index].appendChild(block);
                 }
             }
         }
     }
 }
 
-// ---------------- 게임 로직 ----------------
-
+// --- Game Logic ---
 function getGhostPiece() {
     const ghost = new Tetromino(currentPiece.type);
     ghost.shape = currentPiece.shape;
     ghost.x = currentPiece.x;
     ghost.y = currentPiece.y;
-    
     while (board.isValidPos(ghost, ghost.x, ghost.y + 1)) {
         ghost.y++;
     }
@@ -207,7 +211,6 @@ function getGhostPiece() {
 
 function hold() {
     if (!canHold) return;
-    
     if (heldPiece === null) {
         heldPiece = new Tetromino(currentPiece.type);
         currentPiece = nextPiece;
@@ -217,7 +220,6 @@ function hold() {
         heldPiece = new Tetromino(currentPiece.type);
         currentPiece = new Tetromino(temp);
     }
-    
     canHold = false;
     draw();
 }
@@ -227,34 +229,25 @@ function drop() {
         currentPiece.y++;
     } else {
         board.merge(currentPiece);
-        
         if (currentPiece.y <= 0) {
             gameOver();
             return;
         }
-
         const cleared = board.clearLines();
         if (cleared > 0) {
             lines += cleared;
-            // 라인 제거 별 점수 가중치 1->100, 2->300, 3->500, 4->800
             const pts = [0, 100, 300, 500, 800];
-            score += pts[cleared] * level; // 레벨 배수 적용
-            
-            // 레벨업 로직 (10줄마다)
+            score += pts[cleared] * level;
             const newLevel = Math.floor(lines / 10) + 1;
             if (newLevel > level) {
                 level = newLevel;
-                // 최소 100ms까지 속도 증가
                 dropInterval = Math.max(100, 1000 - (level - 1) * 100);
             }
-            
             updateScore();
         }
-
         currentPiece = nextPiece;
         nextPiece = getRandomPiece();
-        canHold = true; // 새로운 피스가 나오면 Hold 가능
-
+        canHold = true;
         if (!board.isValidPos(currentPiece, currentPiece.x, currentPiece.y)) {
             gameOver();
         }
@@ -274,75 +267,119 @@ function hardDrop() {
 }
 
 function updateScore() {
-    scoreEl.innerText = score.toLocaleString(); // 디자인에 맞춰 콤마 추가
+    scoreEl.innerText = score.toLocaleString();
     linesEl.innerText = lines;
     levelEl.innerText = level;
 }
 
+function updateHighScore() {
+    const best = parseInt(localStorage.getItem('neon-tetris-best') || '0');
+    if (score > best) {
+        localStorage.setItem('neon-tetris-best', score.toString());
+        if (newHighScoreBadge) newHighScoreBadge.classList.remove('hidden');
+    }
+    if (homeBestScoreEl) {
+        homeBestScoreEl.innerText = Math.max(best, score).toLocaleString();
+    }
+}
+
 function gameOver() {
-    cancelAnimationFrame(requestAnimationId);
-    requestAnimationId = null;
+    if (requestAnimationId) {
+        cancelAnimationFrame(requestAnimationId);
+        requestAnimationId = null;
+    }
     finalScoreEl.innerText = score.toLocaleString();
-    modal.classList.remove('hidden');
+    finalLinesEl.innerText = lines;
+    finalLevelEl.innerText = level;
+    updateHighScore();
+    showScreen('gameOver');
 }
 
 function update(time = 0) {
+    if (isPaused) return;
     if (!lastTime) lastTime = time;
     const deltaTime = time - lastTime;
     lastTime = time;
-
     dropCounter += deltaTime;
     if (dropCounter > dropInterval) {
         drop();
     }
-
     draw();
-
     if (requestAnimationId) {
         requestAnimationId = requestAnimationFrame(update);
     }
 }
 
-// ---------------- 제어 ----------------
+// --- Event Listeners ---
 
+// Navigation
+document.getElementById('start-game-btn').addEventListener('click', init);
+document.getElementById('restart-btn').addEventListener('click', init);
+document.getElementById('go-home-btn').addEventListener('click', () => {
+    updateHighScore();
+    showScreen('home');
+});
+
+document.getElementById('nav-home').addEventListener('click', () => showScreen('home'));
+document.getElementById('nav-play').addEventListener('click', () => {
+    if (screens.play.classList.contains('hidden')) {
+        init();
+    }
+});
+document.getElementById('nav-rank').addEventListener('click', () => showScreen('rank'));
+
+// Controls
+document.getElementById('ctrl-left').addEventListener('click', () => {
+    if (board.isValidPos(currentPiece, currentPiece.x - 1, currentPiece.y)) {
+        currentPiece.x--; draw();
+    }
+});
+document.getElementById('ctrl-right').addEventListener('click', () => {
+    if (board.isValidPos(currentPiece, currentPiece.x + 1, currentPiece.y)) {
+        currentPiece.x++; draw();
+    }
+});
+document.getElementById('ctrl-rotate').addEventListener('click', () => {
+    const rotated = currentPiece.getRotatedShape();
+    if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y, rotated)) {
+        currentPiece.rotate(); draw();
+    }
+});
+document.getElementById('ctrl-down').addEventListener('click', () => {
+    drop(); draw();
+});
+
+// Key Controls
 document.addEventListener('keydown', event => {
     if (Object.values(KEYS).includes(event.key)) {
         event.preventDefault();
     }
+    if (screens.play.classList.contains('hidden')) return;
     
-    if (!modal.classList.contains('hidden')) return;
-
     switch (event.key) {
         case KEYS.LEFT:
             if (board.isValidPos(currentPiece, currentPiece.x - 1, currentPiece.y)) {
-                currentPiece.x--;
-                draw();
+                currentPiece.x--; draw();
             }
             break;
         case KEYS.RIGHT:
             if (board.isValidPos(currentPiece, currentPiece.x + 1, currentPiece.y)) {
-                currentPiece.x++;
-                draw();
+                currentPiece.x++; draw();
             }
             break;
         case KEYS.DOWN:
             if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y + 1)) {
-                currentPiece.y++;
-                score += 1;
-                updateScore();
-                draw();
+                currentPiece.y++; score += 1; updateScore(); draw();
             }
             break;
         case KEYS.UP:
             const rotated = currentPiece.getRotatedShape();
             if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y, rotated)) {
-                currentPiece.rotate();
-                draw();
+                currentPiece.rotate(); draw();
             }
             break;
         case KEYS.SPACE:
-            hardDrop();
-            draw();
+            hardDrop(); draw();
             break;
         case KEYS.HOLD:
         case KEYS.HOLD_ALT:
@@ -352,6 +389,11 @@ document.addEventListener('keydown', event => {
     }
 });
 
-restartBtn.addEventListener('click', init);
+// Initial Home Screen load
+function startApp() {
+    const best = parseInt(localStorage.getItem('neon-tetris-best') || '0');
+    if (homeBestScoreEl) homeBestScoreEl.innerText = best.toLocaleString();
+    showScreen('home');
+}
 
-init();
+startApp();

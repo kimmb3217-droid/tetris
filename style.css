@@ -1,25 +1,101 @@
 /* style.css */
-/* Core styles are integrated into index.html using Tailwind and custom <style> block. */
-/* This file can be used for additional global overrides or complex animations. */
+/* Neon Tetrix - Kinetic Observatory Styling */
 
-:root {
-    --primary: #8ff5ff;
-    --secondary: #ff51fa;
+/* --- Custom Utilities --- */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-::-webkit-scrollbar {
-    width: 6px;
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(176, 190, 197, 0.2);
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.04);
 }
 
-::-webkit-scrollbar-track {
-    background: #070e1b;
+.subtle-shadow {
+    box-shadow: 0 4px 20px -2px rgba(96, 125, 139, 0.1);
 }
 
-::-webkit-scrollbar-thumb {
-    background: #1c2639;
-    border-radius: 10px;
+.soft-elevation {
+    box-shadow: 0 4px 20px -2px rgba(96, 125, 139, 0.08);
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #414857;
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* --- Base --- */
+body {
+    background-color: #F5F7F8;
+    color: #263238;
+    overflow-x: hidden;
+    height: 100dvh;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Tetris Grid & Blocks --- */
+.tetris-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    gap: 2px;
+    aspect-ratio: 10/20;
+    position: relative;
+}
+
+.block-cell {
+    position: absolute;
+    width: 10%;
+    height: 5%;
+    transition: top 0.1s linear, left 0.1s ease-in-out;
+}
+
+.tetris-block {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    border-top: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ghost-piece {
+    opacity: 0.2;
+}
+
+.ghost-block {
+    width: 100%;
+    height: 100%;
+    border: 2px solid currentColor;
+    border-radius: 4px;
+    background: transparent;
+}
+
+/* --- Color Mapping --- */
+.block-I { background-color: #4DD0E1; }
+.block-J { background-color: #64B5F6; }
+.block-L { background-color: #FFB74D; }
+.block-O { background-color: #FFF176; }
+.block-S { background-color: #81C784; }
+.block-T { background-color: #BA68C8; }
+.block-Z { background-color: #E57373; }
+
+/* --- Animations --- */
+@keyframes pulse-glow {
+    0% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.5; }
+}
+
+.glow-animation {
+    animation: pulse-glow 3s infinite ease-in-out;
 }
