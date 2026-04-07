@@ -328,29 +328,42 @@ document.getElementById('nav-play').addEventListener('click', () => {
 });
 document.getElementById('nav-rank').addEventListener('click', () => showScreen('rank'));
 
-// Controls
-document.getElementById('ctrl-left').addEventListener('click', () => {
-    if (board.isValidPos(currentPiece, currentPiece.x - 1, currentPiece.y)) {
-        currentPiece.x--; draw();
+// Controls (Mobile/Touch)
+function handleControl(action) {
+    if (screens.play.classList.contains('hidden') || isPaused) return;
+    
+    switch(action) {
+        case 'left':
+            if (board.isValidPos(currentPiece, currentPiece.x - 1, currentPiece.y)) {
+                currentPiece.x--; draw();
+            }
+            break;
+        case 'right':
+            if (board.isValidPos(currentPiece, currentPiece.x + 1, currentPiece.y)) {
+                currentPiece.x++; draw();
+            }
+            break;
+        case 'rotate':
+            const rotated = currentPiece.getRotatedShape();
+            if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y, rotated)) {
+                currentPiece.rotate(); draw();
+            }
+            break;
+        case 'down':
+            drop(); draw();
+            break;
+        case 'hold':
+            hold();
+            break;
     }
-});
-document.getElementById('ctrl-right').addEventListener('click', () => {
-    if (board.isValidPos(currentPiece, currentPiece.x + 1, currentPiece.y)) {
-        currentPiece.x++; draw();
-    }
-});
-document.getElementById('ctrl-rotate').addEventListener('click', () => {
-    const rotated = currentPiece.getRotatedShape();
-    if (board.isValidPos(currentPiece, currentPiece.x, currentPiece.y, rotated)) {
-        currentPiece.rotate(); draw();
-    }
-});
-document.getElementById('ctrl-down').addEventListener('click', () => {
-    drop(); draw();
-});
-document.getElementById('ctrl-hold').addEventListener('click', () => {
-    hold();
-});
+}
+
+document.getElementById('ctrl-left').addEventListener('pointerdown', (e) => { e.preventDefault(); handleControl('left'); });
+document.getElementById('ctrl-right').addEventListener('pointerdown', (e) => { e.preventDefault(); handleControl('right'); });
+document.getElementById('ctrl-rotate').addEventListener('pointerdown', (e) => { e.preventDefault(); handleControl('rotate'); });
+document.getElementById('ctrl-down').addEventListener('pointerdown', (e) => { e.preventDefault(); handleControl('down'); });
+document.getElementById('ctrl-hold').addEventListener('pointerdown', (e) => { e.preventDefault(); handleControl('hold'); });
+
 
 // Key Controls
 document.addEventListener('keydown', event => {
