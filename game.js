@@ -348,6 +348,9 @@ document.getElementById('ctrl-rotate').addEventListener('click', () => {
 document.getElementById('ctrl-down').addEventListener('click', () => {
     drop(); draw();
 });
+document.getElementById('ctrl-hold').addEventListener('click', () => {
+    hold();
+});
 
 // Key Controls
 document.addEventListener('keydown', event => {
