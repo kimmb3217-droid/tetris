@@ -2,12 +2,15 @@
 // NEON TETRIX - Kinetic Observatory Rendering Engine
 
 // --- DOM Elements ---
+const globalNav = document.getElementById('global-nav');
 const boardEl = document.getElementById('game-board');
 const scoreEl = document.getElementById('score');
 const linesEl = document.getElementById('lines');
 const levelEl = document.getElementById('level');
 const nextGridEl = document.getElementById('next-piece-grid');
 const heldGridEl = document.getElementById('held-piece-grid');
+const bestScoreHudEl = document.getElementById('best-score-hud');
+const ingameNewRecordEl = document.getElementById('ingame-new-record');
 
 const finalScoreEl = document.getElementById('final-score');
 const finalLinesEl = document.getElementById('final-lines');
@@ -58,6 +61,13 @@ function showScreen(screenKey) {
         screens[screenKey].classList.remove('hidden');
     }
     
+    // Toggle global nav visibility
+    if (screenKey === 'play') {
+        globalNav.classList.add('hidden');
+    } else {
+        globalNav.classList.remove('hidden');
+    }
+
     // Stop game loop if not on play screen
     if (screenKey !== 'play') {
         if (requestAnimationId) {
@@ -71,14 +81,18 @@ function showScreen(screenKey) {
 function init() {
     board.reset();
     score = 0;
+    displayedScore = 0;
     lines = 0;
     level = 1;
     dropInterval = 1000;
     heldPiece = null;
     canHold = true;
     isPaused = false;
-    
     updateScore();
+    if (ingameNewRecordEl) ingameNewRecordEl.classList.add('hidden');
+    
+    const best = parseInt(localStorage.getItem('neon-tetris-best') || '0');
+    if (bestScoreHudEl) bestScoreHudEl.innerText = best.toLocaleString();
     
     currentPiece = getRandomPiece();
     nextPiece = getRandomPiece();
@@ -266,10 +280,40 @@ function hardDrop() {
     updateScore();
 }
 
+let displayedScore = 0;
 function updateScore() {
-    scoreEl.innerText = score.toLocaleString();
+    // Smooth score count-up
+    const diff = score - displayedScore;
+    if (diff > 0) {
+        displayedScore += Math.ceil(diff / 10);
+        if (displayedScore > score) displayedScore = score;
+        scoreEl.innerText = displayedScore.toLocaleString();
+        
+        // Pulse effect
+        scoreEl.classList.add('scale-105', 'text-primary');
+        setTimeout(() => scoreEl.classList.remove('scale-105'), 100);
+        
+        if (displayedScore < score) {
+            requestAnimationFrame(updateScore);
+        }
+    } else {
+        scoreEl.innerText = score.toLocaleString();
+    }
+
     linesEl.innerText = lines;
     levelEl.innerText = level;
+    
+    // Live high score check
+    const best = parseInt(localStorage.getItem('neon-tetris-best') || '0');
+    if (score > best && best > 0) {
+        if (ingameNewRecordEl) {
+            if (ingameNewRecordEl.classList.contains('hidden')) {
+                // First time breaking the record in this session
+                ingameNewRecordEl.classList.remove('hidden');
+                // Optional: Add a sound or major effect here
+            }
+        }
+    }
 }
 
 function updateHighScore() {
