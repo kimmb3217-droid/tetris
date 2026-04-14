@@ -126,17 +126,17 @@
     </section>
 
     <!-- [2] GAMEPLAY SCREEN (Minimalist View) -->
-    <section id="screen-play" class="hidden relative z-10 min-h-screen flex flex-col overflow-hidden">
+    <section id="screen-play" class="hidden relative z-10 flex flex-col overflow-hidden" style="height: 100dvh;">
 
         <!-- Main Gameplay Canvas -->
-        <main class="flex-grow relative flex items-center justify-center py-6 px-8 w-full">
-            <div class="flex items-start justify-center gap-6 max-w-lg w-full h-full">
+        <main class="flex-1 min-h-0 relative flex items-center justify-center py-2 px-4 w-full overflow-hidden">
+            <div class="flex items-start justify-center gap-3 max-w-lg w-full h-full">
 
                 <!-- Game Board Column: Scoreboard on top, board below -->
-                <div class="flex flex-col gap-3 flex-1">
+                <div class="flex flex-col gap-2 flex-1 h-full min-h-0">
 
                     <!-- Inline Scoreboard HUD (바로 게임 보드 위에 배치) -->
-                    <div class="relative">
+                    <div class="relative shrink-0">
                         <!-- Score + New Record -->
                         <div class="relative group">
                             <div class="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
@@ -183,8 +183,8 @@
                     </div>
 
                     <!-- Game Board -->
-                    <div class="relative h-[60vh] max-h-[600px] aspect-[10/20] z-10 w-full">
-                        <div id="game-board" class="tetris-grid h-full bg-surface/40 rounded-[2rem] border-[3px] border-white p-1.5 shadow-xl relative overflow-hidden">
+                    <div class="relative flex-1 min-h-0 z-10 w-full flex items-start">
+                        <div id="game-board" class="tetris-grid w-full bg-surface/40 rounded-[2rem] border-[3px] border-white p-1.5 shadow-xl relative overflow-hidden">
                             <!-- Faint background grid lines -->
                             <div class="absolute inset-0 grid grid-cols-10 grid-rows-20 gap-px opacity-[0.02] pointer-events-none">
                                 <div class="border-r border-b border-on-surface"></div>
@@ -195,7 +195,7 @@
                 </div>
 
                 <!-- Right Side Panel: HOLD and NEXT -->
-                <div class="flex flex-col gap-4 pt-[3.5rem] shrink-0">
+                <div class="flex flex-col gap-3 pt-[3rem] shrink-0">
                     <div class="glass-panel rounded-2xl p-4 w-28 h-28 flex flex-col items-center justify-center relative">
                         <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-surface px-3 py-1 rounded-full text-[9px] font-headline font-extrabold tracking-widest text-on-surface-variant uppercase shadow-sm border border-outline-variant/20">HOLD</span>
                         <div id="held-piece-grid" class="w-16 h-16"></div>
@@ -234,7 +234,7 @@
         </main>
 
         <!-- Gameplay Controls (Mobile Only) -->
-        <div class="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 grid grid-cols-5 gap-4 px-4 w-full max-w-md z-40">
+        <div class="md:hidden shrink-0 grid grid-cols-5 gap-3 px-4 w-full max-w-md mx-auto" style="padding-top: 0.5rem; padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));">
             <button id="ctrl-hold" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
                 <span class="material-symbols-outlined text-3xl">swap_horiz</span>
             </button>
