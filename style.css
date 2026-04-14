@@ -142,3 +142,19 @@ body {
     color: #78909C;
     white-space: nowrap;
 }
+
+/* --- Drawer & Overlay --- */
+#nav-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+#nav-drawer.active {
+    transform: translateX(0);
+}
+
+.drawer-item-active {
+    background-color: rgba(96, 125, 139, 0.08); /* primary/8 */
+    color: #607D8B; /* primary */
+    border-left: 4px solid #607D8B;
+}

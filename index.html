@@ -69,7 +69,8 @@
 
     <!-- Top Navigation Shell (Shared) -->
     <nav id="global-nav" class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-surface/60 backdrop-blur-xl border-b border-outline-variant/30">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-4">
+            <button id="menu-btn" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">menu</button>
             <span class="material-symbols-outlined text-primary">grid_view</span>
         </div>
         <h1 class="font-headline tracking-[0.15em] uppercase text-lg font-bold text-on-surface">NEON PULSE</h1>
@@ -234,7 +235,7 @@
         </main>
 
         <!-- Gameplay Controls (Mobile Only) -->
-        <div class="md:hidden shrink-0 grid grid-cols-5 gap-3 px-4 w-full max-w-md mx-auto" style="padding-top: 0.5rem; padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));">
+        <div class="md:hidden shrink-0 grid grid-cols-5 gap-3 px-4 w-full max-w-md mx-auto" style="padding-top: 0.5rem; padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));">
             <button id="ctrl-hold" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
                 <span class="material-symbols-outlined text-3xl">swap_horiz</span>
             </button>
@@ -250,6 +251,30 @@
             <button id="ctrl-down" class="aspect-square glass-panel rounded-xl flex items-center justify-center text-on-surface active:scale-90 transition-all shadow-sm">
                 <span class="material-symbols-outlined text-3xl">keyboard_arrow_down</span>
             </button>
+        </div>
+    </section>
+
+    <!-- [5] USER PROFILE SCREEN (Placeholder) -->
+    <section id="screen-user" class="hidden relative z-10 min-h-screen pt-24 px-6 flex flex-col items-center">
+        <div class="w-full max-w-md">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-24 h-24 rounded-full bg-primary/20 border-4 border-white shadow-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-5xl text-primary">person</span>
+                </div>
+                <h2 class="font-headline text-2xl font-bold">Player One</h2>
+                <p class="text-on-surface-variant text-sm font-medium">Professional Stacker</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="glass-panel p-4 rounded-xl flex justify-between items-center">
+                    <span class="text-sm font-bold">Total Games</span>
+                    <span class="font-headline font-bold text-primary">128</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl flex justify-between items-center">
+                    <span class="text-sm font-bold">Total Lines</span>
+                    <span class="font-headline font-bold text-primary">4,520</span>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -327,24 +352,50 @@
         </div>
     </section>
 
-    <!-- Navigation Bar (Persistent) -->
-    <nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/80 backdrop-blur-2xl border-t border-outline-variant/30 rounded-t-2xl">
-        <button id="nav-home" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
-            <span class="material-symbols-outlined">home</span>
-            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">HOME</span>
-        </button>
-        <button id="nav-play" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
-            <span class="material-symbols-outlined">sports_esports</span>
-            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">PLAY</span>
-        </button>
-        <button id="nav-rank" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
-            <span class="material-symbols-outlined">leaderboard</span>
-            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">RANK</span>
-        </button>
-        <button id="nav-user" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
-            <span class="material-symbols-outlined">person</span>
-            <span class="font-headline text-[10px] font-bold tracking-tight uppercase">USER</span>
-        </button>
+    <!-- [4] NAVIGATION DRAWER (Responsive Menu) -->
+    <div id="nav-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <nav id="nav-drawer" class="fixed top-0 left-0 w-72 h-full bg-surface z-[70] -translate-x-full transition-transform duration-300 ease-out shadow-2xl flex flex-col">
+        <div class="px-6 py-8 border-b border-outline-variant/30 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">grid_view</span>
+                <h2 class="font-headline font-bold text-xl text-on-surface">MENU</h2>
+            </div>
+            <button id="close-drawer-btn" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">close</button>
+        </div>
+        
+        <div class="flex-1 py-4 overflow-y-auto">
+            <button id="drawer-nav-home" class="w-full px-6 py-4 flex items-center gap-4 hover:bg-primary/5 text-on-surface-variant hover:text-primary transition-all group">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">home</span>
+                <span class="font-headline font-bold tracking-tight uppercase">HOME</span>
+            </button>
+            <button id="drawer-nav-play" class="w-full px-6 py-4 flex items-center gap-4 hover:bg-primary/5 text-on-surface-variant hover:text-primary transition-all group border-l-4 border-transparent hover:border-primary">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">sports_esports</span>
+                <span class="font-headline font-bold tracking-tight uppercase">PLAY</span>
+            </button>
+            <button id="drawer-nav-rank" class="w-full px-6 py-4 flex items-center gap-4 hover:bg-primary/5 text-on-surface-variant hover:text-primary transition-all group">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">leaderboard</span>
+                <span class="font-headline font-bold tracking-tight uppercase">RANK</span>
+            </button>
+            <button id="drawer-nav-user" class="w-full px-6 py-4 flex items-center gap-4 hover:bg-primary/5 text-on-surface-variant hover:text-primary transition-all group">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">person</span>
+                <span class="font-headline font-bold tracking-tight uppercase">USER</span>
+            </button>
+            
+            <div class="mt-8 px-6 pt-8 border-t border-outline-variant/30">
+                <p class="text-[10px] font-headline font-bold tracking-widest text-on-surface-variant uppercase mb-4">Settings</p>
+                <div class="flex items-center justify-between p-3 glass-panel rounded-xl border border-outline-variant/30">
+                    <span class="text-xs font-semibold">Dark Mode</span>
+                    <div class="w-10 h-5 bg-primary/20 rounded-full relative">
+                        <div class="absolute right-1 top-1 w-3 h-3 bg-primary rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-6 text-center">
+            <p class="text-[10px] font-headline font-bold text-on-surface-variant/40 tracking-widest uppercase">Version 1.2.0</p>
+        </div>
     </nav>
 
     <script src="./tetromino.js"></script>

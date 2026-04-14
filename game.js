@@ -21,7 +21,8 @@ const screens = {
     home: document.getElementById('screen-home'),
     play: document.getElementById('screen-play'),
     gameOver: document.getElementById('screen-gameover'),
-    rank: document.getElementById('screen-rank')
+    rank: document.getElementById('screen-rank'),
+    user: document.getElementById('screen-user')
 };
 
 const homeBestScoreEl = document.getElementById('home-best-score');
@@ -61,12 +62,11 @@ function showScreen(screenKey) {
         screens[screenKey].classList.remove('hidden');
     }
     
-    // Toggle global nav visibility
-    if (screenKey === 'play') {
-        globalNav.classList.add('hidden');
-    } else {
-        globalNav.classList.remove('hidden');
-    }
+    // Close drawer when switching screens
+    closeDrawer();
+    
+    // Toggle global nav visibility (always keep visible as requested)
+    globalNav.classList.remove('hidden');
 
     // Stop game loop if not on play screen
     if (screenKey !== 'play') {
@@ -359,20 +359,49 @@ function update(time = 0) {
 // Navigation
 document.getElementById('start-game-btn').addEventListener('click', init);
 document.getElementById('restart-btn').addEventListener('click', init);
+// Navigation (Drawer)
+const navOverlay = document.getElementById('nav-overlay');
+const navDrawer = document.getElementById('nav-drawer');
+const menuBtn = document.getElementById('menu-btn');
+const closeDrawerBtn = document.getElementById('close-drawer-btn');
+
+function openDrawer() {
+    navOverlay.classList.remove('hidden');
+    setTimeout(() => {
+        navOverlay.classList.add('active');
+        navDrawer.classList.add('active');
+    }, 10);
+}
+
+function closeDrawer() {
+    navOverlay.classList.remove('active');
+    navDrawer.classList.remove('active');
+    setTimeout(() => {
+        navOverlay.classList.add('hidden');
+    }, 300);
+}
+
+if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+if (navOverlay) navOverlay.addEventListener('click', closeDrawer);
+
+document.getElementById('drawer-nav-home').addEventListener('click', () => showScreen('home'));
+document.getElementById('drawer-nav-play').addEventListener('click', () => {
+    if (screens.play.classList.contains('hidden')) {
+        init();
+    } else {
+        closeDrawer();
+    }
+});
+document.getElementById('drawer-nav-rank').addEventListener('click', () => showScreen('rank'));
+document.getElementById('drawer-nav-user').addEventListener('click', () => showScreen('user'));
+
 document.getElementById('go-home-btn').addEventListener('click', () => {
     updateHighScore();
     showScreen('home');
 });
 
-document.getElementById('nav-home').addEventListener('click', () => showScreen('home'));
-document.getElementById('nav-play').addEventListener('click', () => {
-    if (screens.play.classList.contains('hidden')) {
-        init();
-    }
-});
-document.getElementById('nav-rank').addEventListener('click', () => showScreen('rank'));
-
-// Controls (Mobile/Touch)
+// Buttons and Actions
 function handleControl(action) {
     if (screens.play.classList.contains('hidden') || isPaused) return;
     
