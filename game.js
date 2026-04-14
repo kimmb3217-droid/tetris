@@ -102,7 +102,11 @@ function init() {
     showScreen('play');
     
     lastTime = 0;
-    draw();
+    // draw(); // Removed DOM draw
+    window.updatePhaserGame(board, currentPiece, getGhostPiece());
+    window.updatePhaserNext(nextPiece);
+    window.updatePhaserHeld(heldPiece);
+    
     requestAnimationId = requestAnimationFrame(update);
 }
 
@@ -113,102 +117,16 @@ function getRandomPiece() {
 }
 
 // --- Rendering Logic ---
-function createBlockElement(x, y, colorClass, type = 'normal') {
-    const cell = document.createElement('div');
-    cell.className = `block-cell ${type === 'ghost' ? 'ghost-piece' : ''}`;
-    cell.style.left = `${x * 10}%`;
-    cell.style.top = `${y * 5}%`;
-    
-    const block = document.createElement('div');
-    block.className = type === 'ghost' ? `ghost-block` : `tetris-block block-${colorClass}`;
-    
-    if (type === 'ghost') {
-        block.style.color = getHexForType(colorClass);
-    }
-    
-    cell.appendChild(block);
-    return cell;
-}
-
-function getHexForType(type) {
-    const hex = {
-        I: '#4DD0E1', J: '#64B5F6', L: '#FFB74D', O: '#FFF176', S: '#81C784', T: '#BA68C8', Z: '#E57373'
-    };
-    return hex[type] || '#fff';
-}
 
 function draw() {
-    boardEl.innerHTML = '';
-    
-    // Ghost
-    const ghost = getGhostPiece();
-    drawPieceToContainer(boardEl, ghost, 'ghost');
-    
-    // Current
-    drawPieceToContainer(boardEl, currentPiece);
-    
-    // Stacked
-    for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-            if (board.grid[r][c] !== 0) {
-                const el = createBlockElement(c, r, board.grid[r][c]);
-                boardEl.appendChild(el);
-            }
-        }
-    }
-    
+    // Moved to Phaser rendering in phaser-game.js
+    window.updatePhaserGame(board, currentPiece, getGhostPiece());
     updateSidePanels();
 }
 
-function drawPieceToContainer(container, piece, type = 'normal') {
-    for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-            if (piece.shape[r][c] !== 0) {
-                const el = createBlockElement(piece.x + c, piece.y + r, piece.color, type);
-                container.appendChild(el);
-            }
-        }
-    }
-}
-
 function updateSidePanels() {
-    renderSmallGrid(nextGridEl, nextPiece);
-    if (heldPiece) {
-        renderSmallGrid(heldGridEl, heldPiece);
-    } else {
-        heldGridEl.innerHTML = '';
-    }
-}
-
-function renderSmallGrid(container, piece) {
-    container.innerHTML = '';
-    container.style.display = 'grid';
-    container.style.gridTemplateColumns = 'repeat(4, 1fr)';
-    container.style.gridTemplateRows = 'repeat(4, 1fr)';
-    container.className = 'w-full h-full gap-1';
-    
-    const cells = Array.from({length: 16}, () => {
-        const d = document.createElement('div');
-        d.className = 'aspect-square';
-        return d;
-    });
-    cells.forEach(c => container.appendChild(c));
-    
-    const startRow = Math.floor((4 - piece.shape.length) / 2);
-    const startCol = Math.floor((4 - piece.shape[0].length) / 2);
-    
-    for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-            if (piece.shape[r][c] !== 0) {
-                const index = (startRow + r) * 4 + (startCol + c);
-                if (index >= 0 && index < 16) {
-                    const block = document.createElement('div');
-                    block.className = `tetris-block block-${piece.color} w-full h-full`;
-                    cells[index].appendChild(block);
-                }
-            }
-        }
-    }
+    window.updatePhaserNext(nextPiece);
+    window.updatePhaserHeld(heldPiece);
 }
 
 // --- Game Logic ---
@@ -482,6 +400,7 @@ document.addEventListener('keydown', event => {
 function startApp() {
     const best = parseInt(localStorage.getItem('neon-tetris-best') || '0');
     if (homeBestScoreEl) homeBestScoreEl.innerText = best.toLocaleString();
+    window.initPhaser();
     showScreen('home');
 }
 
