@@ -69,12 +69,7 @@ section[id^="screen-"] {
     display: none !important;
 }
 
-/* --- Tetris Grid & Blocks --- */
 .tetris-grid {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(20, 1fr);
-    gap: 2px;
     aspect-ratio: 10/20;
     position: relative;
     height: 100%;
@@ -183,4 +178,13 @@ section[id^="screen-"] {
     background-color: rgba(96, 125, 139, 0.08); /* primary/8 */
     color: #607D8B; /* primary */
     border-left: 4px solid #607D8B;
+}
+
+/* Ensure Phaser canvases fill their containers */
+.tetris-grid canvas,
+#next-piece-grid canvas,
+#held-piece-grid canvas {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
 }

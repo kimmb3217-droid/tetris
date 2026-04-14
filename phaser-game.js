@@ -26,6 +26,11 @@ class TetrisScene extends Phaser.Scene {
         this.ghostGraphics = this.add.graphics();
         this.blockGraphics = this.add.graphics();
         
+        // Test rectangle to verify rendering
+        const test = this.add.graphics();
+        test.fillStyle(0xff0000, 0.5);
+        test.fillRect(0, 0, 100, 100);
+        
         // Listen for events from game.js
         this.events.on('update-board', this.updateBoard, this);
         this.events.on('update-pieces', this.updatePieces, this);
@@ -150,10 +155,9 @@ const config = {
     parent: 'game-board',
     width: 320,
     height: 640,
-    transparent: true,
+    backgroundColor: '#000000', // Black background for debugging
     scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        mode: Phaser.Scale.FIT
     },
     scene: [TetrisScene]
 };

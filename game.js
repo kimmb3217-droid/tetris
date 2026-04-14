@@ -101,6 +101,9 @@ function init() {
     
     showScreen('play');
     
+    // Ensure Phaser is initialized and visible
+    window.initPhaser();
+    
     lastTime = 0;
     // draw(); // Removed DOM draw
     window.updatePhaserGame(board, currentPiece, getGhostPiece());
@@ -400,7 +403,6 @@ document.addEventListener('keydown', event => {
 function startApp() {
     const best = parseInt(localStorage.getItem('neon-tetris-best') || '0');
     if (homeBestScoreEl) homeBestScoreEl.innerText = best.toLocaleString();
-    window.initPhaser();
     showScreen('home');
 }
 
