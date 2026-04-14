@@ -103,7 +103,7 @@ section[id^="screen-"] {
 }
 
 .ghost-piece {
-    opacity: 0.2;
+    opacity: 0.45;
 }
 
 .ghost-block {
@@ -111,7 +111,7 @@ section[id^="screen-"] {
     height: 100%;
     border: 2px solid currentColor;
     border-radius: 4px;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.05);
 }
 
 /* --- Color Mapping --- */
