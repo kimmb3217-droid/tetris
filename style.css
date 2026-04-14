@@ -1,6 +1,16 @@
 /* style.css */
 /* Neon Tetrix - Kinetic Observatory Styling */
 
+:root {
+    --header-height: 64px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --header-height: 56px;
+    }
+}
+
 /* --- Custom Utilities --- */
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -37,6 +47,22 @@ body {
     color: #263238;
     overflow-x: hidden;
     height: 100dvh;
+}
+
+/* Base screen spacing */
+section[id^="screen-"] {
+    padding-top: var(--header-height);
+    padding-top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+}
+
+#screen-play {
+    height: 100dvh;
+    padding-top: 0; /* Handled by main in screen-play */
+}
+
+#screen-play main {
+    padding-top: calc(var(--header-height) + 0.5rem);
+    padding-top: calc(var(--header-height) + env(safe-area-inset-top, 0px) + 0.5rem);
 }
 
 .hidden {
