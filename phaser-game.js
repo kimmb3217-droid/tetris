@@ -26,10 +26,6 @@ class TetrisScene extends Phaser.Scene {
         this.ghostGraphics = this.add.graphics();
         this.blockGraphics = this.add.graphics();
         
-        // Test rectangle to verify rendering
-        const test = this.add.graphics();
-        test.fillStyle(0xff0000, 0.5);
-        test.fillRect(0, 0, 100, 100);
         
         // Listen for events from game.js
         this.events.on('update-board', this.updateBoard, this);
@@ -68,8 +64,8 @@ class TetrisScene extends Phaser.Scene {
         const { width, height } = this.scale;
         const cellSize = width / 10;
 
-        // 1. Draw Board Grid (Faint)
-        this.gridGraphics.lineStyle(1, 0x000000, 0.05);
+        // 1. Draw Board Grid (Subtle gray for white background)
+        this.gridGraphics.lineStyle(1, 0x000000, 0.1);
         for (let x = 0; x <= 10; x++) {
             this.gridGraphics.moveTo(x * cellSize, 0);
             this.gridGraphics.lineTo(x * cellSize, height);
@@ -143,8 +139,6 @@ class TetrisScene extends Phaser.Scene {
         const colors = {
             I: 0x4DD0E1, J: 0x64B5F6, L: 0xFFB74D, O: 0xFFF176, S: 0x81C784, T: 0xBA68C8, Z: 0xE57373
         };
-        // O: 0FFF176 is missing x. 0xFFF176
-        if (type === 'O') return 0xFFF176;
         return colors[type] || 0xffffff;
     }
 }
@@ -155,7 +149,7 @@ const config = {
     parent: 'game-board',
     width: 320,
     height: 640,
-    backgroundColor: '#000000', // Black background for debugging
+    backgroundColor: '#FFFFFF', // White background as requested
     scale: {
         mode: Phaser.Scale.FIT
     },
