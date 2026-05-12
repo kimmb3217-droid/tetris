@@ -254,26 +254,43 @@
         </div>
     </section>
 
-    <!-- [5] USER PROFILE SCREEN (Placeholder) -->
+    <!-- [5] USER PROFILE SCREEN -->
     <section id="screen-user" class="hidden relative z-10 min-h-screen px-6 flex flex-col items-center">
-        <div class="w-full max-w-md">
-            <div class="flex flex-col items-center mb-8">
-                <div class="w-24 h-24 rounded-full bg-primary/20 border-4 border-white shadow-lg flex items-center justify-center mb-4">
-                    <span class="material-symbols-outlined text-5xl text-primary">person</span>
+        <div class="w-full max-w-md pt-20">
+            <div id="user-logged-in" class="hidden flex flex-col items-center mb-8">
+                <div class="relative mb-6">
+                    <img id="user-avatar" src="" alt="Profile" class="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover">
+                    <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
                 </div>
-                <h2 class="font-headline text-2xl font-bold">Player One</h2>
-                <p class="text-on-surface-variant text-sm font-medium">Professional Stacker</p>
+                <h2 id="user-name" class="font-headline text-3xl font-bold mb-1 text-on-surface">Player Name</h2>
+                <p id="user-email" class="text-on-surface-variant text-sm font-medium mb-8">email@example.com</p>
+                
+                <div class="w-full space-y-4 mb-8">
+                    <div class="glass-panel p-5 rounded-2xl flex justify-between items-center border border-outline-variant/30">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">emoji_events</span>
+                            <span class="text-sm font-bold">Personal Best</span>
+                        </div>
+                        <span id="profile-best-score" class="font-headline font-bold text-2xl text-primary">0</span>
+                    </div>
+                </div>
+
+                <button id="logout-btn" class="w-full py-4 rounded-xl border border-outline-variant/50 text-red-500 font-headline font-bold tracking-widest text-xs uppercase hover:bg-red-50 transition-colors">
+                    Sign Out
+                </button>
             </div>
-            
-            <div class="space-y-4">
-                <div class="glass-panel p-4 rounded-xl flex justify-between items-center">
-                    <span class="text-sm font-bold">Total Games</span>
-                    <span class="font-headline font-bold text-primary">128</span>
+
+            <div id="user-logged-out" class="flex flex-col items-center justify-center py-20 text-center">
+                <div class="w-20 h-20 rounded-3xl bg-surface-container-highest flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-4xl text-on-surface-variant">account_circle</span>
                 </div>
-                <div class="glass-panel p-4 rounded-xl flex justify-between items-center">
-                    <span class="text-sm font-bold">Total Lines</span>
-                    <span class="font-headline font-bold text-primary">4,520</span>
-                </div>
+                <h2 class="font-headline text-2xl font-bold mb-2">Sync Your Progress</h2>
+                <p class="text-on-surface-variant text-sm mb-10 max-w-[240px]">Sign in with Google to save your high scores and compete on the global leaderboard.</p>
+                
+                <button id="login-btn" class="w-full h-14 bg-white border border-outline-variant/50 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all shadow-sm">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+                    <span class="font-headline font-bold text-sm text-on-surface">Continue with Google</span>
+                </button>
             </div>
         </div>
     </section>
@@ -318,37 +335,18 @@
     </section>
 
     <!-- [4] RANK SCREEN -->
-    <section id="screen-rank" class="hidden relative z-10 pb-32 px-4 max-w-md mx-auto min-h-screen">
-        <div class="flex justify-center mb-8 bg-surface-container-low p-1.5 rounded-xl border border-outline-variant/50">
-            <button class="flex-1 py-2 px-4 rounded-lg text-sm font-headline font-bold bg-white text-primary soft-elevation">Global</button>
-            <button class="flex-1 py-2 px-4 rounded-lg text-sm font-headline font-medium text-on-surface-variant">Friends</button>
+    <section id="screen-rank" class="hidden relative z-10 pb-32 px-4 max-w-md mx-auto min-h-screen pt-20">
+        <div class="text-center mb-10">
+            <h2 class="font-headline text-4xl font-extrabold tracking-tighter text-on-surface mb-2">LEADERBOARD</h2>
+            <div class="h-1 w-12 bg-primary mx-auto rounded-full"></div>
         </div>
-        
-        <!-- Podium Placeholder -->
-        <div class="flex items-end justify-center gap-2 mb-10 h-48">
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-16 h-16 rounded-full border-2 border-primary/20 bg-white soft-elevation mb-2"></div>
-                <span class="text-xs font-headline font-bold text-on-surface-variant">PLAYER_B</span>
-            </div>
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-20 h-20 rounded-full border-2 border-primary bg-white shadow-lg mb-3"></div>
-                <span class="text-sm font-headline font-bold text-on-background">TOP_ONE</span>
-            </div>
-            <div class="flex flex-col items-center flex-1">
-                <div class="w-16 h-16 rounded-full border-2 border-primary/20 bg-white soft-elevation mb-2"></div>
-                <span class="text-xs font-headline font-bold text-on-surface-variant">PLAYER_C</span>
-            </div>
-        </div>
-        
-        <div class="space-y-3">
-             <div class="glass-panel rounded-xl p-4 flex items-center justify-between border border-outline-variant/40 soft-elevation">
-                <div class="flex items-center gap-4">
-                    <span class="w-6 text-center font-headline font-bold text-on-surface-variant">4</span>
-                    <p class="text-sm font-headline font-bold text-on-surface">PIXEL_REAPER</p>
-                </div>
-                <span class="font-headline font-bold text-sm text-primary">642,100</span>
+
+        <div id="leaderboard-container" class="space-y-3">
+             <!-- Dynamic ranking rows will be inserted here -->
+             <div class="flex flex-col items-center justify-center py-20 opacity-40">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                <p class="text-xs font-headline font-bold tracking-widest uppercase">Loading Rankings...</p>
              </div>
-             <!-- More rows can be added -->
         </div>
     </section>
 
@@ -402,6 +400,6 @@
     <script src="./tetromino.js"></script>
     <script src="./board.js"></script>
     <script src="./phaser-game.js"></script>
-    <script src="./game.js"></script>
+    <script type="module" src="./game.js"></script>
 </body>
 </html>

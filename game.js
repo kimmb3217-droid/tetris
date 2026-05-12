@@ -1,5 +1,6 @@
 // game.js
 // NEON TETRIX - Kinetic Observatory Rendering Engine
+import { firebaseService } from './firebase-service.js';
 
 // --- DOM Elements ---
 const globalNav = document.getElementById('global-nav');
@@ -26,6 +27,17 @@ const screens = {
 };
 
 const homeBestScoreEl = document.getElementById('home-best-score');
+
+// --- User Profile Elements ---
+const userLoggedInDiv = document.getElementById('user-logged-in');
+const userLoggedOutDiv = document.getElementById('user-logged-out');
+const userAvatarImg = document.getElementById('user-avatar');
+const userNameText = document.getElementById('user-name');
+const userEmailText = document.getElementById('user-email');
+const profileBestScoreEl = document.getElementById('profile-best-score');
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const leaderboardContainer = document.getElementById('leaderboard-container');
 
 // --- Game State ---
 let board = new Board();
@@ -74,6 +86,11 @@ function showScreen(screenKey) {
             cancelAnimationFrame(requestAnimationId);
             requestAnimationId = null;
         }
+    }
+
+    // Refresh data when switching to specific screens
+    if (screenKey === 'rank') {
+        renderLeaderboard();
     }
 }
 
@@ -257,6 +274,14 @@ function gameOver() {
     finalLinesEl.innerText = lines;
     finalLevelEl.innerText = level;
     updateHighScore();
+    
+    // Save to Firebase if logged in
+    if (firebaseService.user) {
+        firebaseService.saveHighScore(score).then(() => {
+            syncUserBest();
+        });
+    }
+
     showScreen('gameOver');
 }
 
@@ -398,6 +423,79 @@ document.addEventListener('keydown', event => {
             break;
     }
 });
+
+// --- Firebase Integration Logic ---
+
+async function syncUserBest() {
+    if (firebaseService.user) {
+        const best = await firebaseService.getUserBest();
+        const localBest = parseInt(localStorage.getItem('neon-tetris-best') || '0');
+        const finalBest = Math.max(best, localBest);
+        
+        localStorage.setItem('neon-tetris-best', finalBest.toString());
+        if (homeBestScoreEl) homeBestScoreEl.innerText = finalBest.toLocaleString();
+        if (profileBestScoreEl) profileBestScoreEl.innerText = finalBest.toLocaleString();
+        if (bestScoreHudEl) bestScoreHudEl.innerText = finalBest.toLocaleString();
+    }
+}
+
+async function renderLeaderboard() {
+    if (!leaderboardContainer) return;
+    
+    // Show loading state
+    leaderboardContainer.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-20 opacity-40">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+            <p class="text-xs font-headline font-bold tracking-widest uppercase">Fetching Rankings...</p>
+        </div>
+    `;
+
+    const scores = await firebaseService.getLeaderboard(10);
+    
+    if (scores.length === 0) {
+        leaderboardContainer.innerHTML = `
+            <div class="text-center py-20 opacity-40">
+                <p class="text-sm font-headline font-medium">No scores yet. Be the first!</p>
+            </div>
+        `;
+        return;
+    }
+
+    leaderboardContainer.innerHTML = scores.map((s, index) => `
+        <div class="glass-panel rounded-xl p-4 flex items-center justify-between border border-outline-variant/40 soft-elevation animate-in fade-in slide-in-from-bottom-2 duration-500" style="animation-delay: ${index * 50}ms">
+            <div class="flex items-center gap-4">
+                <span class="w-6 text-center font-headline font-black text-lg ${index < 3 ? 'text-primary' : 'text-on-surface-variant/40'}">${index + 1}</span>
+                <div class="flex items-center gap-3">
+                    <img src="${s.photoURL || 'https://via.placeholder.com/32'}" class="w-8 h-8 rounded-full border border-outline-variant/30">
+                    <div>
+                        <p class="text-sm font-headline font-bold text-on-surface leading-tight">${s.displayName || 'Anonymous'}</p>
+                        <p class="text-[9px] font-headline font-bold text-on-surface-variant/50 uppercase tracking-widest">${new Date(s.timestamp?.toDate()).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            </div>
+            <span class="font-headline font-black text-lg text-primary tabular-nums">${s.score.toLocaleString()}</span>
+        </div>
+    `).join('');
+}
+
+// Auth state handling
+firebaseService.onAuthChange((user) => {
+    if (user) {
+        userLoggedInDiv.classList.remove('hidden');
+        userLoggedOutDiv.classList.add('hidden');
+        userAvatarImg.src = user.photoURL;
+        userNameText.innerText = user.displayName;
+        userEmailText.innerText = user.email;
+        syncUserBest();
+    } else {
+        userLoggedInDiv.classList.add('hidden');
+        userLoggedOutDiv.classList.remove('hidden');
+    }
+});
+
+// Auth Event Listeners
+if (loginBtn) loginBtn.addEventListener('click', () => firebaseService.loginWithGoogle());
+if (logoutBtn) logoutBtn.addEventListener('click', () => firebaseService.logout());
 
 // Initial Home Screen load
 function startApp() {
